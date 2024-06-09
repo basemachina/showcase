@@ -112,7 +112,7 @@ const cumulativeViewCounts = dailyViewCounts.reduce((acc, count, index) => {
 
 const streamHistories = [
   {
-    post_url: "https://www.instagram.com/p/xxx",
+    item_id: "xxx",
     account_id: "@f_fukufuku",
     total_views: "300,223",
     favorites: "23",
@@ -123,7 +123,7 @@ const streamHistories = [
     streamed_at: "2024-04-10 12:00",
   },
   {
-    post_url: "https://www.instagram.com/p/yyy",
+    item_id: "xxx",
     account_id: "@yeonmi_park",
     total_views: "1,000,223",
     favorites: "123",
@@ -134,7 +134,7 @@ const streamHistories = [
     streamed_at: "2024-04-09 12:00",
   },
   {
-    post_url: "https://www.instagram.com/p/zzz",
+    item_id: "xxx",
     account_id: "@kazuma_kawaguchi",
     total_views: "2,000,223",
     favorites: "223",
@@ -145,7 +145,7 @@ const streamHistories = [
     streamed_at: "2024-04-08 12:00",
   },
   {
-    post_url: "https://www.instagram.com/p/aaa",
+    item_id: "xxx",
     account_id: "@yukio_takano",
     total_views: "3,000,223",
     favorites: "323",
@@ -156,7 +156,7 @@ const streamHistories = [
     streamed_at: "2024-04-07 12:00",
   },
   {
-    post_url: "https://www.instagram.com/p/bbb",
+    item_id: "xxx",
     account_id: "@kazuma_kawaguchi",
     total_views: "4,000,223",
     favorites: "423",
@@ -167,7 +167,7 @@ const streamHistories = [
     streamed_at: "2024-04-06 12:00",
   },
   {
-    post_url: "https://www.instagram.com/p/ccc",
+    item_id: "xxx",
     account_id: "@yukio_takano",
     total_views: "5,000,223",
     favorites: "523",
@@ -178,7 +178,7 @@ const streamHistories = [
     streamed_at: "2024-03-29 12:00",
   },
   {
-    post_url: "https://www.instagram.com/p/ddd",
+    item_id: "xxx",
     account_id: "@kazuma_kawaguchi",
     total_views: "6,000,223",
     favorites: "623",
@@ -189,7 +189,7 @@ const streamHistories = [
     streamed_at: "2024-03-22 12:00",
   },
   {
-    post_url: "https://www.instagram.com/p/eee",
+    item_id: "xxx",
     account_id: "@yukio_takano",
     total_views: "7,000,223",
     favorites: "723",
@@ -463,19 +463,19 @@ const App = () => {
                   billable_views: streamHistory.billable_views,
                   favorites: streamHistory.favorites,
                   comments: streamHistory.comments,
-                  post_url: (
+                  item_id: (
                     <ChakraButton
                       colorScheme="gray"
                       variant="outline"
                       size="xs"
                       width="120px"
                       onClick={() => {
-                        openLink(streamHistory.post_url, {
+                        openLink(streamHistory.item_id, {
                           newTab: true,
                         });
                       }}
                     >
-                      配信詳細
+                      詳細
                     </ChakraButton>
                   ),
                 };
@@ -490,7 +490,7 @@ const App = () => {
               billable_views: "支払対象再生数",
               favorites: "いいね数",
               comments: "コメント数",
-              post_url: "詳細",
+              item_id: "プロモーション対象",
             }}
             searchDisabled={true}
             scrollable={true}
