@@ -15,6 +15,7 @@ import {
   Flexbox,
   Select,
   Table,
+  Input,
 } from "@basemachina/view";
 import {
   VStack,
@@ -42,17 +43,17 @@ const samplePromotionTargetDetail = {
   thumbnails: [
     {
       id: 1,
-      url: "/assets/foundation_01.webp",
+      url: "https://raw.githubusercontent.com/basemachina/showcase/main/client-portal-streaming-platform/assets/foundation_01.webp",
       title: "ファンデーション 正面画像",
     },
     {
       id: 2,
-      url: "/assets/foundation_02.webp",
+      url: "https://raw.githubusercontent.com/basemachina/showcase/main/client-portal-streaming-platform/assets/foundation_02.webp",
       title: "デスク配置例",
     },
     {
       id: 3,
-      url: "/assets/foundation_03.webp",
+      url: "https://raw.githubusercontent.com/basemachina/showcase/main/client-portal-streaming-platform/assets/foundation_03.webp",
       title: "モデル使用例",
     },
   ],
@@ -206,11 +207,9 @@ const App = () => {
                     overflow="x-auto"
                     wrap="nowrap"
                   >
-                    {
-                      // 画像一覧を表示する
-                      samplePromotionTargetDetail.thumbnails.map((thumbnail) => {
-                        return (
-                          <Box overflow="visible">
+                    {samplePromotionTargetDetail.thumbnails.map((thumbnail) => {
+                      return (
+                        <Box overflow="visible">
                           <Box width="xl" height="md">
                             <Image
                               size="md"
@@ -221,10 +220,9 @@ const App = () => {
                           <p className="font-bold text-sm my-1">
                             {thumbnail.title}
                           </p>
-                          </Box>
-                        );
-                      })
-                    }
+                        </Box>
+                      );
+                    })}
                   </Flexbox>
                 </div>
               </VStack>
@@ -275,8 +273,8 @@ const App = () => {
                   <Box>
                     <TextInput
                       name="price"
-                      label="金額"
-                      placeholder="例) 1,200円"
+                      label="予算"
+                      placeholder="例) 1,239,200円"
                     />
                   </Box>
                   <Grid repeatCount={2}>
@@ -357,7 +355,7 @@ const App = () => {
                 }}
               >
                 <Flexbox direction="col">
-                  <Box>
+                  <Box width="full">
                     <TextInput
                       name="comment"
                       label="コメント"
