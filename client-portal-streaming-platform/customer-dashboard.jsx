@@ -187,17 +187,6 @@ const SearchConditionModal = ({
   );
 };
 
-const PaymentStatusBadge = ({ status }) => {
-  return (
-    <Badge
-      colorScheme={status === "未支払い" ? "red" : "green"}
-      variant="subtle"
-    >
-      {status}
-    </Badge>
-  );
-};
-
 const App = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
