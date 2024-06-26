@@ -222,7 +222,7 @@ const App = () => {
         {/* SearchCondition Form */}
         <div className="flex flex-row justify-between w-full items-center">
           <Heading size="md" className="mr-4">
-            株式会社ベースマキナ (Develop)
+            株式会社ベースマキナ
           </Heading>
           <div className="flex flex-row space-x-4 items-center">
             <Form
