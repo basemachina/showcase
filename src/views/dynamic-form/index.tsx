@@ -1,22 +1,15 @@
 import {
-  Table,
-  Select,
-  Pagination,
-  openViewLink,
-  LoadingIndicator,
+  Select, LoadingIndicator,
   useExecuteAction,
   useExecuteActionLazy,
   Form,
-  Card,
+  Card
 } from "@basemachina/view";
 import { useFormikContext } from "formik";
 import {
-  HStack,
-  Heading,
-  Button as ChakraButton,
-  Badge,
+  Heading
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
 type DynamicFormContentProps = {
   parents: {
