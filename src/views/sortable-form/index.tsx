@@ -1,18 +1,23 @@
 import {
-    Card,
-    Form,
-    TextInput,
-    Button,
-    Table,
-    showSuccessToast,
-    Flexbox,
-} from "@basemachina/view";
-import {
     Heading,
     VStack,
     HStack,
     Box,
     Text,
+    Card,
+    Button,
+    Flex,
+    FormControl,
+    FormLabel,
+    Input,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    TableContainer,
+    useToast,
 } from "@chakra-ui/react";
 import { useCallback, useState } from "react";
 
@@ -84,11 +89,21 @@ const App = () => {
         setProducts(newProducts);
     }, [products]);
 
+    // フォームの状態
+    const [categoryName, setCategoryName] = useState(categoryData.name);
+
+    // 入力変更ハンドラー
+    const handleCategoryNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCategoryName(e.target.value);
+    };
+
     // フォーム送信処理
-    const handleSubmit = useCallback((values: FormValues) => {
+    const handleSubmit = useCallback((e: React.FormEvent) => {
+        e.preventDefault();
+
         const formData = {
             categoryId: categoryData.id,
-            categoryName: values.categoryName,
+            categoryName: categoryName,
             productOrders: products.map((product) => ({
                 productId: product.id,
                 order: product.order
@@ -99,76 +114,92 @@ const App = () => {
         // executeAction("update-category", formData);
 
         // 成功トーストでリクエストの内容を表示
-        showSuccessToast(`リクエスト内容: ${JSON.stringify(formData, null, 2)}`);
-    }, [products]);
+        toast({
+            title: "成功",
+            description: `リクエスト内容: ${JSON.stringify(formData, null, 2)}`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+        });
+    }, [categoryName, products]);
+
+    const toast = useToast();
 
     return (
-        <div className="flex flex-col gap-2 w-full h-full">
+        <Flex direction="column" gap={2} w="full" h="full">
             <Heading size="sm">商品カテゴリ編集</Heading>
-            <Card>
-                <Form
-                    initialValues={{
-                        categoryName: categoryData.name,
-                    }}
-                    onSubmit={handleSubmit}
-                >
+            <Card p={4}>
+                <form onSubmit={handleSubmit}>
                     <VStack spacing="1rem" align="start">
                         <Box width="full">
-                            <TextInput
-                                name="categoryName"
-                                label="カテゴリ名"
-                                placeholder="カテゴリ名を入力"
-                            />
+                            <FormControl>
+                                <FormLabel>カテゴリ名</FormLabel>
+                                <Input
+                                    value={categoryName}
+                                    onChange={handleCategoryNameChange}
+                                    placeholder="カテゴリ名を入力"
+                                />
+                            </FormControl>
                         </Box>
 
                         <Box width="full">
                             <Text fontWeight="bold" mb={2}>商品の表示順</Text>
                             <Text fontSize="sm" mb={4}>上下ボタンで並び替えてください</Text>
 
-                            <Table
-                                rows={products.map((product, index) => ({
-                                    order: product.order,
-                                    id: product.id,
-                                    jinCode: product.jinCode,
-                                    name: product.name,
-                                    actions: (
-                                        <HStack spacing={2}>
-                                            <Button
-                                                title="↑"
-                                                size="xs"
-                                                color="gray"
-                                                disabled={index === 0}
-                                                onClick={() => moveUp(index)}
-                                            />
-                                            <Button
-                                                title="↓"
-                                                size="xs"
-                                                color="gray"
-                                                disabled={index === products.length - 1}
-                                                onClick={() => moveDown(index)}
-                                            />
-                                        </HStack>
-                                    ),
-                                }))}
-                                columnNames={{
-                                    order: "表示順",
-                                    id: "商品ID",
-                                    jinCode: "JINコード",
-                                    name: "商品名",
-                                    actions: "並び替え",
-                                }}
-                                searchDisabled={true}
-                                scrollable={true}
-                            />
+                            <TableContainer>
+                                <Table size="sm">
+                                    <Thead>
+                                        <Tr>
+                                            <Th>表示順</Th>
+                                            <Th>商品ID</Th>
+                                            <Th>JINコード</Th>
+                                            <Th>商品名</Th>
+                                            <Th>並び替え</Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        {products.map((product, index) => (
+                                            <Tr key={product.id}>
+                                                <Td>{product.order}</Td>
+                                                <Td>{product.id}</Td>
+                                                <Td>{product.jinCode}</Td>
+                                                <Td>{product.name}</Td>
+                                                <Td>
+                                                    <HStack spacing={2}>
+                                                        <Button
+                                                            size="xs"
+                                                            colorScheme="gray"
+                                                            isDisabled={index === 0}
+                                                            onClick={() => moveUp(index)}
+                                                        >
+                                                            ↑
+                                                        </Button>
+                                                        <Button
+                                                            size="xs"
+                                                            colorScheme="gray"
+                                                            isDisabled={index === products.length - 1}
+                                                            onClick={() => moveDown(index)}
+                                                        >
+                                                            ↓
+                                                        </Button>
+                                                    </HStack>
+                                                </Td>
+                                            </Tr>
+                                        ))}
+                                    </Tbody>
+                                </Table>
+                            </TableContainer>
                         </Box>
 
-                        <Flexbox justify="end" width="full">
-                            <Button type="submit" title="保存" color="blue" />
-                        </Flexbox>
+                        <Flex justify="flex-end" width="full" mt={4}>
+                            <Button type="submit" colorScheme="blue">
+                                保存
+                            </Button>
+                        </Flex>
                     </VStack>
-                </Form>
+                </form>
             </Card>
-        </div>
+        </Flex>
     );
 };
 
