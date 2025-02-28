@@ -19,7 +19,6 @@ import {
     TableContainer,
     useToast,
 } from "@chakra-ui/react";
-import { Formik, Form, Field, FieldProps } from "formik";
 import { useCallback, useState } from "react";
 
 // カテゴリ情報のモックデータ
@@ -90,11 +89,21 @@ const App = () => {
         setProducts(newProducts);
     }, [products]);
 
+    // フォームの状態
+    const [categoryName, setCategoryName] = useState(categoryData.name);
+
+    // 入力変更ハンドラー
+    const handleCategoryNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCategoryName(e.target.value);
+    };
+
     // フォーム送信処理
-    const handleSubmit = useCallback((values: FormValues) => {
+    const handleSubmit = useCallback((e: React.FormEvent) => {
+        e.preventDefault();
+
         const formData = {
             categoryId: categoryData.id,
-            categoryName: values.categoryName,
+            categoryName: categoryName,
             productOrders: products.map((product) => ({
                 productId: product.id,
                 order: product.order
@@ -112,7 +121,7 @@ const App = () => {
             duration: 5000,
             isClosable: true,
         });
-    }, [products]);
+    }, [categoryName, products]);
 
     const toast = useToast();
 
@@ -120,87 +129,75 @@ const App = () => {
         <Flex direction="column" gap={2} w="full" h="full">
             <Heading size="sm">商品カテゴリ編集</Heading>
             <Card p={4}>
-                <Formik
-                    initialValues={{
-                        categoryName: categoryData.name,
-                    }}
-                    onSubmit={handleSubmit}
-                >
-                    {({ handleSubmit }) => (
-                        <Form onSubmit={handleSubmit}>
-                            <VStack spacing="1rem" align="start">
-                                <Box width="full">
-                                    <Field name="categoryName">
-                                        {({ field }: FieldProps) => (
-                                            <FormControl>
-                                                <FormLabel>カテゴリ名</FormLabel>
-                                                <Input
-                                                    {...field}
-                                                    placeholder="カテゴリ名を入力"
-                                                />
-                                            </FormControl>
-                                        )}
-                                    </Field>
-                                </Box>
+                <form onSubmit={handleSubmit}>
+                    <VStack spacing="1rem" align="start">
+                        <Box width="full">
+                            <FormControl>
+                                <FormLabel>カテゴリ名</FormLabel>
+                                <Input
+                                    value={categoryName}
+                                    onChange={handleCategoryNameChange}
+                                    placeholder="カテゴリ名を入力"
+                                />
+                            </FormControl>
+                        </Box>
 
-                                <Box width="full">
-                                    <Text fontWeight="bold" mb={2}>商品の表示順</Text>
-                                    <Text fontSize="sm" mb={4}>上下ボタンで並び替えてください</Text>
+                        <Box width="full">
+                            <Text fontWeight="bold" mb={2}>商品の表示順</Text>
+                            <Text fontSize="sm" mb={4}>上下ボタンで並び替えてください</Text>
 
-                                    <TableContainer>
-                                        <ChakraTable size="sm">
-                                            <Thead>
-                                                <Tr>
-                                                    <Th>表示順</Th>
-                                                    <Th>商品ID</Th>
-                                                    <Th>JINコード</Th>
-                                                    <Th>商品名</Th>
-                                                    <Th>並び替え</Th>
-                                                </Tr>
-                                            </Thead>
-                                            <Tbody>
-                                                {products.map((product, index) => (
-                                                    <Tr key={product.id}>
-                                                        <Td>{product.order}</Td>
-                                                        <Td>{product.id}</Td>
-                                                        <Td>{product.jinCode}</Td>
-                                                        <Td>{product.name}</Td>
-                                                        <Td>
-                                                            <HStack spacing={2}>
-                                                                <Button
-                                                                    size="xs"
-                                                                    colorScheme="gray"
-                                                                    isDisabled={index === 0}
-                                                                    onClick={() => moveUp(index)}
-                                                                >
-                                                                    ↑
-                                                                </Button>
-                                                                <Button
-                                                                    size="xs"
-                                                                    colorScheme="gray"
-                                                                    isDisabled={index === products.length - 1}
-                                                                    onClick={() => moveDown(index)}
-                                                                >
-                                                                    ↓
-                                                                </Button>
-                                                            </HStack>
-                                                        </Td>
-                                                    </Tr>
-                                                ))}
-                                            </Tbody>
-                                        </ChakraTable>
-                                    </TableContainer>
-                                </Box>
+                            <TableContainer>
+                                <ChakraTable size="sm">
+                                    <Thead>
+                                        <Tr>
+                                            <Th>表示順</Th>
+                                            <Th>商品ID</Th>
+                                            <Th>JINコード</Th>
+                                            <Th>商品名</Th>
+                                            <Th>並び替え</Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        {products.map((product, index) => (
+                                            <Tr key={product.id}>
+                                                <Td>{product.order}</Td>
+                                                <Td>{product.id}</Td>
+                                                <Td>{product.jinCode}</Td>
+                                                <Td>{product.name}</Td>
+                                                <Td>
+                                                    <HStack spacing={2}>
+                                                        <Button
+                                                            size="xs"
+                                                            colorScheme="gray"
+                                                            isDisabled={index === 0}
+                                                            onClick={() => moveUp(index)}
+                                                        >
+                                                            ↑
+                                                        </Button>
+                                                        <Button
+                                                            size="xs"
+                                                            colorScheme="gray"
+                                                            isDisabled={index === products.length - 1}
+                                                            onClick={() => moveDown(index)}
+                                                        >
+                                                            ↓
+                                                        </Button>
+                                                    </HStack>
+                                                </Td>
+                                            </Tr>
+                                        ))}
+                                    </Tbody>
+                                </ChakraTable>
+                            </TableContainer>
+                        </Box>
 
-                                <Flex justify="flex-end" width="full" mt={4}>
-                                    <Button type="submit" colorScheme="blue">
-                                        保存
-                                    </Button>
-                                </Flex>
-                            </VStack>
-                        </Form>
-                    )}
-                </Formik>
+                        <Flex justify="flex-end" width="full" mt={4}>
+                            <Button type="submit" colorScheme="blue">
+                                保存
+                            </Button>
+                        </Flex>
+                    </VStack>
+                </form>
             </Card>
         </Flex>
     );
