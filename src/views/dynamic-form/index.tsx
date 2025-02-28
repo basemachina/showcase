@@ -9,8 +9,7 @@ import {
   Flex,
   Box
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { useCallback } from "react";
+import { useState, useCallback } from "react";
 
 // Mock implementations for the action hooks
 // Define a type for the error
