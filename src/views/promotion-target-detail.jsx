@@ -174,7 +174,6 @@ const App = () => {
 
   return (
     <div className="flex flex-col gap-2 w-full h-full">
-      <h1>Develop</h1>
       <Tabs variant="enclosed" class="w-full" size="sm">
         <TabList>
           <Tab>基本情報</Tab>
