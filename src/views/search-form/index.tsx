@@ -1,18 +1,29 @@
 import {
-    Alert,
-    Badge, Button,
+    Alert as ChakraAlert,
+    AlertIcon,
+    Badge as ChakraBadge,
+    Button,
     Card,
-    Flexbox,
-    Form, LoadingIndicator,
-    Table,
-    TextInput,
-    DatePicker,
-    Select,
-    showSuccessToast,
-} from "@basemachina/view";
-import {
-    HStack, VStack
+    Flex,
+    FormControl,
+    FormLabel,
+    Input,
+    Select as ChakraSelect,
+    Spinner,
+    Table as ChakraTable,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    TableContainer,
+    Text,
+    Box,
+    HStack,
+    VStack,
+    useToast
 } from "@chakra-ui/react";
+import { Formik, Form, Field, FieldProps } from "formik";
 import { useCallback, useState, useEffect } from "react";
 import { formatDate, formatNull } from "../utils/format";
 
@@ -50,9 +61,12 @@ const ReviewStatusOptions = [
 
 const displayReviewStatusBadge = (status: ReviewStatus) => {
     switch (status) {
-        case ReviewStatus.BEFORE_REVIEW: return <Badge color="blue" title="審査中" />
-        case ReviewStatus.PASSED_REVIEW: return <Badge color="green" title="承認" />
-        case ReviewStatus.REJECTED: return <Badge color="red" title="非承認" />
+        case ReviewStatus.BEFORE_REVIEW:
+            return <ChakraBadge colorScheme="blue">審査中</ChakraBadge>
+        case ReviewStatus.PASSED_REVIEW:
+            return <ChakraBadge colorScheme="green">承認</ChakraBadge>
+        case ReviewStatus.REJECTED:
+            return <ChakraBadge colorScheme="red">非承認</ChakraBadge>
     }
 }
 
@@ -142,117 +156,190 @@ const App = () => {
         fetchMovies();
     }, [fetchMovies]);
 
-    const handleSearch = useCallback(({ values }: { values: SearchParams }) => {
+    const handleSearch = useCallback((values: SearchParams) => {
         setSearchParams({
             ...values,
         });
     }, []);
 
+    const toast = useToast();
+
     const handleRowClick = useCallback((row: Movie) => {
         // openViewLink('movie-detail', { id: row.id }, {
         //     newTab: true,
         // });
-        showSuccessToast(`動画ID: ${row.id} を選択しました`);
-    }, []);
+        toast({
+            title: "成功",
+            description: `動画ID: ${row.id} を選択しました`,
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+        });
+    }, [toast]);
 
     return (
-        <Flexbox direction="col" className="space-y-4">
-            <Card>
-                <Form
+        <Flex direction="column" gap={4}>
+            <Card p={4}>
+                <Formik
                     onSubmit={handleSearch}
                     initialValues={searchParams}
                 >
-                    <VStack spacing="1rem" align="start">
-                        <HStack spacing="1rem">
-                            <div>
-                                <p className="text-xs font-bold mb-2">ユーザーID</p>
-                                <TextInput
-                                    name="user_id"
-                                    label=""
-                                    placeholder="ユーザーIDを入力"
-                                />
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold mb-2">審査ステータス</p>
-                                <div style={{ width: "120px" }}>
-                                    <Select
-                                        name="review_status"
-                                        label=""
-                                        options={ReviewStatusOptions}
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold mb-2">投稿日</p>
-                                <HStack spacing="0.5rem">
-                                    <DatePicker
-                                        name="created_at_from"
-                                        label=""
-                                    />
-                                    <span>〜</span>
-                                    <DatePicker
-                                        name="created_at_to"
-                                        label=""
-                                    />
+                    {({ handleSubmit }) => (
+                        <Form onSubmit={handleSubmit}>
+                            <VStack spacing="1rem" align="start">
+                                <HStack spacing="1rem">
+                                    <Box>
+                                        <Text fontSize="xs" fontWeight="bold" mb={2}>ユーザーID</Text>
+                                        <Field name="user_id">
+                                            {({ field }: FieldProps) => (
+                                                <FormControl>
+                                                    <Input
+                                                        {...field}
+                                                        placeholder="ユーザーIDを入力"
+                                                    />
+                                                </FormControl>
+                                            )}
+                                        </Field>
+                                    </Box>
+                                    <Box>
+                                        <Text fontSize="xs" fontWeight="bold" mb={2}>審査ステータス</Text>
+                                        <Box width="120px">
+                                            <Field name="review_status">
+                                                {({ field }: FieldProps) => (
+                                                    <FormControl>
+                                                        <ChakraSelect {...field}>
+                                                            {ReviewStatusOptions.map(option => (
+                                                                <option key={option.value} value={option.value}>
+                                                                    {option.label}
+                                                                </option>
+                                                            ))}
+                                                        </ChakraSelect>
+                                                    </FormControl>
+                                                )}
+                                            </Field>
+                                        </Box>
+                                    </Box>
+                                    <Box>
+                                        <Text fontSize="xs" fontWeight="bold" mb={2}>投稿日</Text>
+                                        <HStack spacing="0.5rem">
+                                            <Field name="created_at_from">
+                                                {({ field }: FieldProps) => (
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            type="date"
+                                                        />
+                                                    </FormControl>
+                                                )}
+                                            </Field>
+                                            <Text>〜</Text>
+                                            <Field name="created_at_to">
+                                                {({ field }: FieldProps) => (
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            type="date"
+                                                        />
+                                                    </FormControl>
+                                                )}
+                                            </Field>
+                                        </HStack>
+                                    </Box>
                                 </HStack>
-                            </div>
-                        </HStack>
 
-                        <HStack spacing="1rem">
-                            <div>
-                                <p className="text-xs font-bold mb-2">並び順</p>
-                                <HStack spacing="0.5rem">
-                                    <div style={{ width: "120px" }}>
-                                        <Select
-                                            name="order_by_key"
-                                            label=""
-                                            options={[{ value: "id", label: "ID" }, { value: "created_at", label: "投稿日" }, { value: "updated_at", label: "更新日" }]}
-                                        />
-                                    </div>
-                                    <div style={{ width: "120px" }}>
-                                        <Select
-                                            name="order_by_direction"
-                                            label=""
-                                            options={[{ value: "asc", label: "昇順" }, { value: "desc", label: "降順" }]}
-                                        />
-                                    </div>
+                                <HStack spacing="1rem">
+                                    <Box>
+                                        <Text fontSize="xs" fontWeight="bold" mb={2}>並び順</Text>
+                                        <HStack spacing="0.5rem">
+                                            <Box width="120px">
+                                                <Field name="order_by_key">
+                                                    {({ field }: FieldProps) => (
+                                                        <FormControl>
+                                                            <ChakraSelect {...field}>
+                                                                <option value="id">ID</option>
+                                                                <option value="created_at">投稿日</option>
+                                                                <option value="updated_at">更新日</option>
+                                                            </ChakraSelect>
+                                                        </FormControl>
+                                                    )}
+                                                </Field>
+                                            </Box>
+                                            <Box width="120px">
+                                                <Field name="order_by_direction">
+                                                    {({ field }: FieldProps) => (
+                                                        <FormControl>
+                                                            <ChakraSelect {...field}>
+                                                                <option value="asc">昇順</option>
+                                                                <option value="desc">降順</option>
+                                                            </ChakraSelect>
+                                                        </FormControl>
+                                                    )}
+                                                </Field>
+                                            </Box>
+                                        </HStack>
+                                    </Box>
                                 </HStack>
-                            </div>
-                        </HStack>
 
-                        <Button type="submit" title="検索" color="blue" />
-                    </VStack>
-                </Form>
+                                <Button type="submit" colorScheme="blue">
+                                    検索
+                                </Button>
+                            </VStack>
+                        </Form>
+                    )}
+                </Formik>
             </Card>
 
             {
                 loading || !movies ? (
-                    <LoadingIndicator />
+                    <Box textAlign="center" py={4}>
+                        <Spinner />
+                    </Box>
                 ) : (
-                    <div className="w-full">
+                    <Box width="full">
                         {movies.length === 0 ? (
-                            <Alert message="検索結果がありません" color="blue" />
+                            <ChakraAlert status="info">
+                                <AlertIcon />
+                                検索結果がありません
+                            </ChakraAlert>
                         ) : (
-                            <Table
-                                rows={formatMovies(movies)}
-                                columnNames={{
-                                    id: "審査動画ID",
-                                    name: "タイトル",
-                                    review_status: "審査ステータス",
-                                    user_id: "ユーザーID",
-                                    user_name: "ユーザー名",
-                                    created_at: "投稿日",
-                                    updated_at: "更新日",
-                                }}
-                                downloadable
-                                scrollable={true}
-                                onRowClick={handleRowClick}
-                            />
+                            <TableContainer>
+                                <ChakraTable size="sm">
+                                    <Thead>
+                                        <Tr>
+                                            <Th>審査動画ID</Th>
+                                            <Th>タイトル</Th>
+                                            <Th>審査ステータス</Th>
+                                            <Th>ユーザーID</Th>
+                                            <Th>ユーザー名</Th>
+                                            <Th>投稿日</Th>
+                                            <Th>更新日</Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        {formatMovies(movies).map((movie) => (
+                                            <Tr
+                                                key={movie.id}
+                                                onClick={() => handleRowClick(movies.find(m => m.id === movie.id) as Movie)}
+                                                cursor="pointer"
+                                                _hover={{ bg: "gray.50" }}
+                                            >
+                                                <Td>{movie.id}</Td>
+                                                <Td>{movie.name}</Td>
+                                                <Td>{movie.review_status}</Td>
+                                                <Td>{movie.user_id}</Td>
+                                                <Td>{movie.user_name}</Td>
+                                                <Td>{movie.created_at}</Td>
+                                                <Td>{movie.updated_at}</Td>
+                                            </Tr>
+                                        ))}
+                                    </Tbody>
+                                </ChakraTable>
+                            </TableContainer>
                         )}
-                    </div>
+                    </Box>
                 )
             }
-        </Flexbox >
+        </Flex>
     );
 };
 

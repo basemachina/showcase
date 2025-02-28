@@ -1,15 +1,76 @@
+import { useFormikContext, Formik, Form, Field, FieldProps } from "formik";
 import {
-  Select, LoadingIndicator,
-  useExecuteAction,
-  useExecuteActionLazy,
-  Form,
-  Card
-} from "@basemachina/view";
-import { useFormikContext } from "formik";
-import {
-  Heading
+  Heading,
+  Card,
+  FormControl,
+  FormLabel,
+  Select as ChakraSelect,
+  Spinner,
+  Flex,
+  Box
 } from "@chakra-ui/react";
+import { useState } from "react";
 import { useCallback } from "react";
+
+// Mock implementations for the action hooks
+// Define a type for the error
+type ActionError = {
+  message: string;
+};
+
+const useExecuteAction = (actionName: string) => {
+  // Mock data for the "get-parents" action
+  const mockParents = [
+    { id: "1", name: "親カテゴリ1" },
+    { id: "2", name: "親カテゴリ2" },
+    { id: "3", name: "親カテゴリ3" },
+  ];
+
+  return {
+    data: {
+      results: [{ success: mockParents }]
+    },
+    loading: false,
+    error: null as ActionError | null
+  };
+};
+
+const useExecuteActionLazy = (actionName: string) => {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const execute = (params: any) => {
+    setLoading(true);
+
+    // Simulate API call with setTimeout
+    setTimeout(() => {
+      // Mock data based on the action name
+      if (actionName === "get-children-1") {
+        setData({
+          results: [{
+            success: [
+              { id: `${params.id}-1`, name: `子カテゴリ1-${params.id}` },
+              { id: `${params.id}-2`, name: `子カテゴリ2-${params.id}` },
+            ]
+          }]
+        });
+      } else if (actionName === "get-children-2") {
+        setData({
+          results: [{
+            success: [
+              { id: `${params.id}-A`, name: `子カテゴリA-${params.id}` },
+              { id: `${params.id}-B`, name: `子カテゴリB-${params.id}` },
+            ]
+          }]
+        });
+      }
+
+      setLoading(false);
+    }, 500);
+  };
+
+  return [execute, { data, loading, error: null as ActionError | null }] as const;
+};
 
 type DynamicFormContentProps = {
   parents: {
@@ -42,72 +103,91 @@ const DynamicFormContent = ({
   }, [fetchChilds, fetchChilds2]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <Select
-        name="parentId"
-        label="親ID"
-        options={[
-          {
-            label: "選択してください",
-            value: "",
-          },
-          ...parents.map((parent) => ({
-            label: parent.name,
-            value: parent.id,
-          })),
-        ]}
-        onChange={handleChangeParentId}
-      />
+    <Flex direction="column" gap={2}>
+      <Field name="parentId">
+        {({ field, form }: FieldProps) => (
+          <FormControl>
+            <FormLabel>親ID</FormLabel>
+            <ChakraSelect
+              {...field}
+              placeholder="選択してください"
+              onChange={(e) => {
+                field.onChange(e);
+                handleChangeParentId(e);
+              }}
+            >
+              {parents.map((parent) => (
+                <option key={parent.id} value={parent.id}>
+                  {parent.name}
+                </option>
+              ))}
+            </ChakraSelect>
+          </FormControl>
+        )}
+      </Field>
       {
         !values.parentId ? <></> : (
           <>
             {
               fetchChildsResult.loading || !fetchChildsResult.data ? (
-                <LoadingIndicator />
+                <Box textAlign="center" py={4}>
+                  <Spinner />
+                </Box>
               ) : (
-                <Select name="childId" label="子ID" options={[
-                  {
-                    label: "選択してください",
-                    value: "",
-                  },
-                  ...fetchChildsResult.data?.results[0].success.map((child: {
-                    id: string;
-                    name: string;
-                  }) => {
-                    return {
-                      label: child.name,
-                      value: child.id,
-                    };
-                  })
-                ]} />
+                <Field name="childId">
+                  {({ field }: FieldProps) => (
+                    <FormControl>
+                      <FormLabel>子ID</FormLabel>
+                      <ChakraSelect
+                        {...field}
+                        placeholder="選択してください"
+                      >
+                        {fetchChildsResult.data?.results[0].success.map((child: {
+                          id: string;
+                          name: string;
+                        }) => (
+                          <option key={child.id} value={child.id}>
+                            {child.name}
+                          </option>
+                        ))}
+                      </ChakraSelect>
+                    </FormControl>
+                  )}
+                </Field>
               )
             }
             {
               fetchChildsResult2.loading || !fetchChildsResult2.data ? (
-                <LoadingIndicator />
+                <Box textAlign="center" py={4}>
+                  <Spinner />
+                </Box>
               ) : (
-                <Select name="childId2" label="子ID2" options={
-                  [
-                    {
-                      label: "選択してください",
-                      value: "",
-                    },
-                    ...fetchChildsResult2.data?.results[0].success.map((child: {
-                      id: string;
-                      name: string;
-                    }) => {
-                      return {
-                        label: child.name,
-                        value: child.id,
-                      };
-                    })
-                  ]} />
+                <Field name="childId2">
+                  {({ field }: FieldProps) => (
+                    <FormControl>
+                      <FormLabel>子ID2</FormLabel>
+                      <ChakraSelect
+                        {...field}
+                        placeholder="選択してください"
+                      >
+                        {fetchChildsResult2.data?.results[0].success.map((child: {
+                          id: string;
+                          name: string;
+                        }) => (
+                          <option key={child.id} value={child.id}>
+                            {child.name}
+                          </option>
+                        ))}
+                      </ChakraSelect>
+                    </FormControl>
+                  )}
+                </Field>
               )
             }
           </>
         )
       }
-    </div>
+    </Flex>
   );
 };
 
@@ -116,28 +196,34 @@ const App = () => {
     useExecuteAction("get-parents");
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <Box p={4}>Error: {error.message}</Box>;
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full h-full">
+    <Flex direction="column" gap={2} w="full" h="full">
       <Heading size="sm">Dynamic Form</Heading>
       {(loading || !data) ?
-        <LoadingIndicator /> :
-        <Card>
-          <Form
+        <Box textAlign="center" py={4}>
+          <Spinner />
+        </Box> :
+        <Card p={4}>
+          <Formik
             initialValues={{
               parentId: "",
               childId: "",
               childId2: "",
             }}
-            onSubmit={() => { }}>
-            <DynamicFormContent parents={data.results[0].success} />
-          </Form>
+            onSubmit={() => { }}
+          >
+            {() => (
+              <Form>
+                <DynamicFormContent parents={data.results[0].success} />
+              </Form>
+            )}
+          </Formik>
         </Card>
       }
-
-    </div>
+    </Flex>
   );
 };
 
