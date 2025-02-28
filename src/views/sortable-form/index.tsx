@@ -10,7 +10,7 @@ import {
     FormControl,
     FormLabel,
     Input,
-    Table as ChakraTable,
+    Table,
     Thead,
     Tbody,
     Tr,
@@ -147,7 +147,7 @@ const App = () => {
                             <Text fontSize="sm" mb={4}>上下ボタンで並び替えてください</Text>
 
                             <TableContainer>
-                                <ChakraTable size="sm">
+                                <Table size="sm">
                                     <Thead>
                                         <Tr>
                                             <Th>表示順</Th>
@@ -187,7 +187,7 @@ const App = () => {
                                             </Tr>
                                         ))}
                                     </Tbody>
-                                </ChakraTable>
+                                </Table>
                             </TableContainer>
                         </Box>
 

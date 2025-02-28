@@ -3,7 +3,7 @@ import {
   Card,
   FormControl,
   FormLabel,
-  Select as ChakraSelect,
+  Select,
   Spinner,
   Flex,
   Box,
@@ -105,7 +105,7 @@ const App = () => {
           <Flex direction="column" gap={4}>
             <FormControl>
               <FormLabel>親ID</FormLabel>
-              <ChakraSelect
+              <Select
                 value={parentId}
                 onChange={handleParentChange}
                 placeholder="選択してください"
@@ -115,7 +115,7 @@ const App = () => {
                     {parent.name}
                   </option>
                 ))}
-              </ChakraSelect>
+              </Select>
             </FormControl>
 
             {parentId && (
@@ -127,7 +127,7 @@ const App = () => {
                 ) : (
                   <FormControl>
                     <FormLabel>子ID</FormLabel>
-                    <ChakraSelect
+                    <Select
                       value={childId}
                       onChange={handleChild1Change}
                       placeholder="選択してください"
@@ -137,7 +137,7 @@ const App = () => {
                           {child.name}
                         </option>
                       ))}
-                    </ChakraSelect>
+                    </Select>
                   </FormControl>
                 )}
 
@@ -148,7 +148,7 @@ const App = () => {
                 ) : (
                   <FormControl>
                     <FormLabel>子ID2</FormLabel>
-                    <ChakraSelect
+                    <Select
                       value={childId2}
                       onChange={handleChild2Change}
                       placeholder="選択してください"
@@ -158,7 +158,7 @@ const App = () => {
                           {child.name}
                         </option>
                       ))}
-                    </ChakraSelect>
+                    </Select>
                   </FormControl>
                 )}
               </>

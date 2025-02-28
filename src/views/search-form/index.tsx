@@ -1,16 +1,16 @@
 import {
-    Alert as ChakraAlert,
+    Alert,
     AlertIcon,
-    Badge as ChakraBadge,
+    Badge,
     Button,
     Card,
     Flex,
     FormControl,
     FormLabel,
     Input,
-    Select as ChakraSelect,
+    Select,
     Spinner,
-    Table as ChakraTable,
+    Table,
     Thead,
     Tbody,
     Tr,
@@ -61,11 +61,11 @@ const ReviewStatusOptions = [
 const displayReviewStatusBadge = (status: ReviewStatus) => {
     switch (status) {
         case ReviewStatus.BEFORE_REVIEW:
-            return <ChakraBadge colorScheme="blue">審査中</ChakraBadge>
+            return <Badge colorScheme="blue">審査中</Badge>
         case ReviewStatus.PASSED_REVIEW:
-            return <ChakraBadge colorScheme="green">承認</ChakraBadge>
+            return <Badge colorScheme="green">承認</Badge>
         case ReviewStatus.REJECTED:
-            return <ChakraBadge colorScheme="red">非承認</ChakraBadge>
+            return <Badge colorScheme="red">非承認</Badge>
     }
 }
 
@@ -196,7 +196,7 @@ const App = () => {
                                 <Text fontSize="xs" fontWeight="bold" mb={2}>審査ステータス</Text>
                                 <Box width="120px">
                                     <FormControl>
-                                        <ChakraSelect
+                                        <Select
                                             name="review_status"
                                             value={formValues.review_status}
                                             onChange={handleInputChange}
@@ -206,7 +206,7 @@ const App = () => {
                                                     {option.label}
                                                 </option>
                                             ))}
-                                        </ChakraSelect>
+                                        </Select>
                                     </FormControl>
                                 </Box>
                             </Box>
@@ -240,7 +240,7 @@ const App = () => {
                                 <HStack spacing="0.5rem">
                                     <Box width="120px">
                                         <FormControl>
-                                            <ChakraSelect
+                                            <Select
                                                 name="order_by_key"
                                                 value={formValues.order_by_key}
                                                 onChange={handleInputChange}
@@ -248,19 +248,19 @@ const App = () => {
                                                 <option value="id">ID</option>
                                                 <option value="created_at">投稿日</option>
                                                 <option value="updated_at">更新日</option>
-                                            </ChakraSelect>
+                                            </Select>
                                         </FormControl>
                                     </Box>
                                     <Box width="120px">
                                         <FormControl>
-                                            <ChakraSelect
+                                            <Select
                                                 name="order_by_direction"
                                                 value={formValues.order_by_direction}
                                                 onChange={handleInputChange}
                                             >
                                                 <option value="asc">昇順</option>
                                                 <option value="desc">降順</option>
-                                            </ChakraSelect>
+                                            </Select>
                                         </FormControl>
                                     </Box>
                                 </HStack>
@@ -282,13 +282,13 @@ const App = () => {
                 ) : (
                     <Box width="full">
                         {movies.length === 0 ? (
-                            <ChakraAlert status="info">
+                            <Alert status="info">
                                 <AlertIcon />
                                 検索結果がありません
-                            </ChakraAlert>
+                            </Alert>
                         ) : (
                             <TableContainer>
-                                <ChakraTable size="sm">
+                                <Table size="sm">
                                     <Thead>
                                         <Tr>
                                             <Th>審査動画ID</Th>
@@ -318,7 +318,7 @@ const App = () => {
                                             </Tr>
                                         ))}
                                     </Tbody>
-                                </ChakraTable>
+                                </Table>
                             </TableContainer>
                         )}
                     </Box>
