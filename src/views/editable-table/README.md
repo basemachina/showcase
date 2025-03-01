@@ -62,4 +62,4 @@ type ColumnConfig = {
 
 ## スクリーンショット
 
-![編集可能なテーブル](https://github.com/k-kawabata/react-sample-code/blob/main/src/views/editable-table/editable-table-screenshot.gif)
+![編集可能なテーブル](https://github.com/basemachina/showcase/blob/main/src/views/editable-table/editable-table-screenshot.gif)
