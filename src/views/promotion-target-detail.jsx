@@ -1,22 +1,5 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useState, useMemo } from "react";
 import dayjs from "dayjs";
-import {
-  Card,
-  Badge,
-  Grid,
-  Form,
-  Stat,
-  Box,
-  Heading,
-  Button,
-  TextInput,
-  DatePicker,
-  Image,
-  Flexbox,
-  Select,
-  Table,
-  Input,
-} from "@basemachina/view";
 import {
   VStack,
   Tabs,
@@ -24,6 +7,30 @@ import {
   TabList,
   TabPanel,
   TabPanels,
+  Card,
+  CardBody,
+  Badge,
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+  Box,
+  Heading,
+  Button,
+  Input,
+  Image,
+  Flex,
+  Select,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  FormControl,
+  FormLabel,
+  Text
 } from "@chakra-ui/react";
 
 const samplePromotionTargetDetail = {
@@ -110,29 +117,20 @@ const samplePromotionTargetDetail = {
 
 const VerticalTable = ({ descriptions }) => {
   return (
-    <div class="ring-1 ring-black ring-opacity-5 sm:rounded-md w-full">
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <tbody>
+    <Box borderWidth="1px" borderRadius="md" width="100%">
+      <Table size="sm" variant="simple">
+        <Tbody>
           {Object.entries(descriptions).map(([key, value], index) => {
             return (
-              <tr
-                class={`${
-                  index < Object.keys(descriptions).length - 1 ? "border-b" : ""
-                } border-gray-200 dark:border-gray-700`}
-              >
-                <th
-                  scope="row"
-                  class="px-6 py-4 font-semibold text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800 w-40"
-                >
-                  {key}
-                </th>
-                <td class="px-6 py-4 text-gray-600">{value}</td>
-              </tr>
+              <Tr key={key} borderBottomWidth={index < Object.keys(descriptions).length - 1 ? "1px" : "0"}>
+                <Th width="200px" bg="gray.50">{key}</Th>
+                <Td>{value}</Td>
+              </Tr>
             );
           })}
-        </tbody>
-      </table>
-    </div>
+        </Tbody>
+      </Table>
+    </Box>
   );
 };
 
@@ -153,10 +151,26 @@ const PublishStatusBadge = ({ status }) => {
     }
   }, [status]);
 
-  return <Badge color={color} title={statusLabel[status]} />;
+  return <Badge colorScheme={color}>{statusLabel[status]}</Badge>;
 };
 
 const App = () => {
+  const [formValues, setFormValues] = useState({
+    title: "",
+    campaign_kind: "",
+    release_timing: "",
+    price: "",
+    release_datetime: "",
+    comment: ""
+  });
+  
+  const [submitValues, setSubmitValues] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({ ...prev, [name]: value }));
+  };
+
   const descriptions = {
     ID: samplePromotionTargetDetail.id,
     商品名: samplePromotionTargetDetail.name,
@@ -165,7 +179,7 @@ const App = () => {
     ),
     詳細: samplePromotionTargetDetail.description
       .split("\n")
-      .map((line, index) => <div key={index}>{line}</div>),
+      .map((line, index) => <Box key={index}>{line}</Box>),
     販売価格: samplePromotionTargetDetail.price + "円",
     プロモーション再生単価: samplePromotionTargetDetail.budget_per_play + "円",
     作成日: dayjs(samplePromotionTargetDetail.created_at).format("YYYY/MM/DD"),
@@ -173,8 +187,8 @@ const App = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full h-full">
-      <Tabs variant="enclosed" class="w-full" size="sm">
+    <Flex direction="column" gap={2} w="100%" h="100%">
+      <Tabs variant="enclosed" width="100%" size="sm">
         <TabList>
           <Tab>基本情報</Tab>
           <Tab>キャンペーン</Tab>
@@ -182,212 +196,226 @@ const App = () => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <div className="flex flex-row space-x-4 w-full">
-              <VStack align="start" spacing="1rem" className="w-full">
-                <Grid repeatCount={3} gap={4} width="full">
-                  <Stat
-                    title="プロモーション回数"
-                    value={samplePromotionTargetDetail.stats.promotion_count.toLocaleString()}
-                  />
-                  <Stat
-                    title="視聴UU"
-                    value={samplePromotionTargetDetail.stats.audience_count.toLocaleString()}
-                  />
-                  <Stat
-                    title="予算消化額"
-                    value={`${samplePromotionTargetDetail.stats.budget_consumption.toLocaleString()}円`}
-                  />
-                </Grid>
-                <VerticalTable descriptions={descriptions} />;
-                <Heading size="lg" text="画像一覧" />
-                <div className="flex overflow-hidden">
-                  <Flexbox
+            <Flex direction="row" gap={4} width="100%">
+              <VStack align="start" spacing="1rem" width="100%">
+                <SimpleGrid columns={3} spacing={4} width="100%">
+                  <Stat>
+                    <StatLabel>プロモーション回数</StatLabel>
+                    <StatNumber>{samplePromotionTargetDetail.stats.promotion_count.toLocaleString()}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel>視聴UU</StatLabel>
+                    <StatNumber>{samplePromotionTargetDetail.stats.audience_count.toLocaleString()}</StatNumber>
+                  </Stat>
+                  <Stat>
+                    <StatLabel>予算消化額</StatLabel>
+                    <StatNumber>{`${samplePromotionTargetDetail.stats.budget_consumption.toLocaleString()}円`}</StatNumber>
+                  </Stat>
+                </SimpleGrid>
+                <VerticalTable descriptions={descriptions} />
+                <Heading size="lg">画像一覧</Heading>
+                <Box overflow="hidden">
+                  <Flex
                     direction="row"
-                    justify="start"
-                    overflow="x-auto"
-                    wrap="nowrap"
+                    justifyContent="flex-start"
+                    overflowX="auto"
+                    flexWrap="nowrap"
                   >
                     {samplePromotionTargetDetail.thumbnails.map((thumbnail) => {
                       return (
-                        <Box overflow="visible">
-                          <Box width="xl" height="md">
+                        <Box key={thumbnail.id} overflow="visible" mr={4}>
+                          <Box width="300px" height="200px">
                             <Image
-                              size="md"
+                              boxSize="100%"
                               objectFit="cover"
-                              url={thumbnail.url}
+                              src={thumbnail.url}
+                              alt={thumbnail.title}
                             />
                           </Box>
-                          <p className="font-bold text-sm my-1">
+                          <Text fontWeight="bold" fontSize="sm" my={1}>
                             {thumbnail.title}
-                          </p>
+                          </Text>
                         </Box>
                       );
                     })}
-                  </Flexbox>
-                </div>
+                  </Flex>
+                </Box>
               </VStack>
-            </div>
+            </Flex>
           </TabPanel>
           <TabPanel>
-            <Heading size="lg" text="期間限定キャンペーンの作成" />
+            <Heading size="lg" mt={6} mb={4}>期間限定キャンペーンの作成</Heading>
             <Card>
-              <Form
-                initialValues={{}}
-                onSubmit={(v) => {
-                  setSubmitValues(v);
-                }}
-              >
-                <Flexbox direction="col">
-                  <Box>
-                    <TextInput
-                      name="title"
-                      label="お知らせタイトル"
-                      placeholder="例) 入会キャンペーン適用のお知らせ"
-                    />
-                  </Box>
-                  <Grid repeatCount={3}>
-                    <Box>
-                      <Select
-                        name="campaign_kind"
-                        label="キャンペーン種別"
-                        options={[
-                          {
-                            label: "キャッシュバック",
-                            value: "before_screening",
-                          },
-                          { label: "ポイント付与", value: "published" },
-                        ]}
+              <CardBody>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  setSubmitValues(formValues);
+                }}>
+                  <Flex direction="column" gap={4}>
+                    <FormControl>
+                      <FormLabel>お知らせタイトル</FormLabel>
+                      <Input
+                        name="title"
+                        value={formValues.title}
+                        onChange={handleChange}
+                        placeholder="例) 入会キャンペーン適用のお知らせ"
                       />
-                    </Box>
-                    <Box>
-                      <Select
-                        name="release_timing"
-                        label="適用タイミング"
-                        options={[
-                          { label: "即時", value: "before_screening" },
-                          { label: "翌週", value: "published" },
-                        ]}
+                    </FormControl>
+                    
+                    <SimpleGrid columns={3} spacing={4}>
+                      <FormControl>
+                        <FormLabel>キャンペーン種別</FormLabel>
+                        <Select 
+                          name="campaign_kind"
+                          value={formValues.campaign_kind}
+                          onChange={handleChange}
+                        >
+                          <option value="">選択してください</option>
+                          <option value="before_screening">キャッシュバック</option>
+                          <option value="published">ポイント付与</option>
+                        </Select>
+                      </FormControl>
+                      
+                      <FormControl>
+                        <FormLabel>適用タイミング</FormLabel>
+                        <Select 
+                          name="release_timing"
+                          value={formValues.release_timing}
+                          onChange={handleChange}
+                        >
+                          <option value="">選択してください</option>
+                          <option value="before_screening">即時</option>
+                          <option value="published">翌週</option>
+                        </Select>
+                      </FormControl>
+                    </SimpleGrid>
+                    
+                    <FormControl>
+                      <FormLabel>予算</FormLabel>
+                      <Input
+                        name="price"
+                        value={formValues.price}
+                        onChange={handleChange}
+                        placeholder="例) 1,239,200円"
                       />
-                    </Box>
-                  </Grid>
-                  <Box>
-                    <TextInput
-                      name="price"
-                      label="予算"
-                      placeholder="例) 1,239,200円"
-                    />
-                  </Box>
-                  <Grid repeatCount={2}>
-                    <Box>
-                      <p className="text-sm font-bold">適用開始日時</p>
-                      <DatePicker name="release_datetime" withTime />
-                    </Box>
-                  </Grid>
+                    </FormControl>
+                    
+                    <SimpleGrid columns={2} spacing={4}>
+                      <FormControl>
+                        <FormLabel fontSize="sm" fontWeight="bold">適用開始日時</FormLabel>
+                        <Input
+                          name="release_datetime"
+                          type="datetime-local"
+                          value={formValues.release_datetime}
+                          onChange={handleChange}
+                        />
+                      </FormControl>
+                    </SimpleGrid>
 
-                  <Button type="submit" title="適用する" color="blue" />
-                </Flexbox>
-              </Form>
+                    <Button type="submit" colorScheme="blue" alignSelf="flex-start" mt={2}>
+                      適用する
+                    </Button>
+                  </Flex>
+                </form>
+              </CardBody>
             </Card>
-            {/* キャンペーンのテーブル。ステータスはバッヂ表記にする */}
-            <Heading size="lg" text="キャンペーン一覧" />
-            <Table
-              rows={
-                samplePromotionTargetDetail.campaigns.map((campaign) => {
-                  return {
-                    title: campaign.title,
-                    kind: (
-                      <Badge
-                        title={
-                          campaign.kind === "cashback"
-                            ? "キャッシュバック"
-                            : "ポイント付与"
-                        }
-                        color={campaign.kind === "cashback" ? "blue" : "green"}
-                      />
-                    ),
-                    release_timing: (
-                      <Badge
-                        title={
-                          campaign.release_timing === "immediate"
-                            ? "即時"
-                            : "翌週"
-                        }
-                        color={
-                          campaign.release_timing === "immediate"
-                            ? "green"
-                            : "yellow"
-                        }
-                      />
-                    ),
-                    budget: campaign.budget.toLocaleString() + "円",
-                    release_datetime: campaign.release_datetime,
-                    close_at: campaign.close_at,
-                    status: (
-                      <Badge
-                        title={campaign.status === "active" ? "有効" : "無効"}
-                        color={campaign.status === "active" ? "green" : "gray"}
-                      />
-                    ),
-                  };
-                }) ?? []
-              }
-              columnNames={{
-                title: "タイトル",
-                kind: "種別",
-                release_timing: "適用タイミング",
-                budget: "予算",
-                release_datetime: "適用開始日時",
-                close_at: "終了日時",
-                status: "ステータス",
-              }}
-              searchDisabled={true}
-              scrollable={true}
-            />
+
+            <Heading size="lg" mt={6} mb={4}>キャンペーン一覧</Heading>
+            <TableContainer>
+              <Table size="sm">
+                <Thead>
+                  <Tr>
+                    <Th>タイトル</Th>
+                    <Th>種別</Th>
+                    <Th>適用タイミング</Th>
+                    <Th>予算</Th>
+                    <Th>適用開始日時</Th>
+                    <Th>終了日時</Th>
+                    <Th>ステータス</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {samplePromotionTargetDetail.campaigns.map((campaign) => (
+                    <Tr key={campaign.id}>
+                      <Td>{campaign.title}</Td>
+                      <Td>
+                        <Badge
+                          colorScheme={campaign.kind === "cashback" ? "blue" : "green"}
+                        >
+                          {campaign.kind === "cashback" ? "キャッシュバック" : "ポイント付与"}
+                        </Badge>
+                      </Td>
+                      <Td>
+                        <Badge
+                          colorScheme={campaign.release_timing === "immediate" ? "green" : "yellow"}
+                        >
+                          {campaign.release_timing === "immediate" ? "即時" : "翌週"}
+                        </Badge>
+                      </Td>
+                      <Td>{campaign.budget.toLocaleString() + "円"}</Td>
+                      <Td>{campaign.release_datetime}</Td>
+                      <Td>{campaign.close_at}</Td>
+                      <Td>
+                        <Badge
+                          colorScheme={campaign.status === "active" ? "green" : "gray"}
+                        >
+                          {campaign.status === "active" ? "有効" : "無効"}
+                        </Badge>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           </TabPanel>
           <TabPanel>
-            <Card>
-              <Form
-                initialValues={{
-                  comment: "",
-                }}
-                onSubmit={(v) => {
-                  setSubmitValues(v);
-                }}
-              >
-                <Flexbox direction="col">
-                  <Box width="full">
-                    <TextInput
-                      name="comment"
-                      label="コメント"
-                      placeholder="コメントを入力してください"
-                    />
-                  </Box>
-                  <Button type="submit" title="コメントする" color="blue" />
-                </Flexbox>
-              </Form>
+            <Card mt={6}>
+              <CardBody>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  setSubmitValues({...formValues});
+                }}>
+                  <Flex direction="column" gap={4}>
+                    <FormControl>
+                      <FormLabel>コメント</FormLabel>
+                      <Input
+                        name="comment"
+                        value={formValues.comment}
+                        onChange={handleChange}
+                        placeholder="コメントを入力してください"
+                      />
+                    </FormControl>
+                    <Button type="submit" colorScheme="blue" alignSelf="flex-start">
+                      コメントする
+                    </Button>
+                  </Flex>
+                </form>
+              </CardBody>
             </Card>
 
-            <Heading size="lg" text="コメント一覧" />
-            <Table
-              rows={
-                samplePromotionTargetDetail.operator_notes.map((note) => {
-                  return {
-                    comment: note.comment,
-                    created_at: note.created_at,
-                  };
-                }) ?? []
-              }
-              columnNames={{
-                comment: "コメント",
-                created_at: "日時",
-              }}
-              searchDisabled={true}
-              scrollable={true}
-            />
+            <Heading size="lg" mt={6} mb={4}>コメント一覧</Heading>
+            <TableContainer>
+              <Table size="sm">
+                <Thead>
+                  <Tr>
+                    <Th>コメント</Th>
+                    <Th>日時</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {samplePromotionTargetDetail.operator_notes.map((note) => (
+                    <Tr key={note.id}>
+                      <Td>{note.comment}</Td>
+                      <Td>{note.created_at}</Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           </TabPanel>
         </TabPanels>
       </Tabs>
-    </div>
+    </Flex>
   );
 };
 

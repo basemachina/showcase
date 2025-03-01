@@ -1,23 +1,8 @@
-import { useCallback, useState, useEffect, useMemo } from "react";
-import { useFormikContext } from "formik";
+import { useCallback, useState, useEffect } from "react";
 import {
-  Grid,
-  Select,
-  DatePicker,
-  Form,
-  Button,
-  Stat,
-  Table,
-  openLink,
-  Pagination,
-} from "@basemachina/view";
-import {
-  HStack,
   VStack,
   Heading,
-  Button as ChakraButton,
-  Badge,
-  Modal,
+  Button, Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
@@ -25,6 +10,17 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+  Flex,
+  Box,
+  Text,
+  FormControl,
+  FormLabel,
+  Input,
+  Select
 } from "@chakra-ui/react";
 import { Bar } from "react-chartjs-2";
 
@@ -124,34 +120,73 @@ const initialStartDate = new Date(
   .split("T")[0];
 const initialEndDate = new Date().toISOString().split("T")[0];
 
-const DateRangeFormContent = ({ searchCondition }) => {
-  const { values, submitForm } = useFormikContext();
-  useEffect(() => {
-    submitForm();
-  }, [values.startDate, values.endDate]);
+const DateRangeFormContent = ({ searchCondition, onChange }) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    onChange({ [name]: value });
+  };
 
   return (
-    <div className="flex flex-row space-x-4 items-center">
-      <DatePicker name="startDate" value={searchCondition.startDate} />
-      <p class="font-bold text-sm text-gray-700">〜</p>
-      <DatePicker name="endDate" value={searchCondition.endDate} />
-    </div>
+    <Flex direction="row" alignItems="center" gap={4}>
+      <Input
+        name="startDate"
+        type="date"
+        value={searchCondition.startDate}
+        onChange={handleChange}
+        size="sm"
+        width="auto"
+      />
+      <Text fontWeight="bold" fontSize="sm" color="gray.700">〜</Text>
+      <Input
+        name="endDate"
+        type="date"
+        value={searchCondition.endDate}
+        onChange={handleChange}
+        size="sm"
+        width="auto"
+      />
+    </Flex>
   );
 };
 
-const SearchConditionFormContent = () => {
+const SearchConditionFormContent = ({ formValues, onChange }) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    onChange({ [name]: value });
+  };
+
   return (
-    <VStack align="start" spacing={2}>
-      <Select
-        name="productId"
-        label="商品"
-        options={[{ value: "", label: "選択してください" }, ...sampleCosmetics]}
-      />
-      <Select
-        name="campaignId"
-        label="キャンペーン"
-        options={[{ value: "", label: "選択してください" }, ...sampleCampaigns]}
-      />
+    <VStack align="start" spacing={4}>
+      <FormControl>
+        <FormLabel>商品</FormLabel>
+        <Select
+          name="productId"
+          value={formValues.productId}
+          onChange={handleChange}
+        >
+          <option value="">選択してください</option>
+          {sampleCosmetics.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl>
+        <FormLabel>キャンペーン</FormLabel>
+        <Select
+          name="campaignId"
+          value={formValues.campaignId}
+          onChange={handleChange}
+        >
+          <option value="">選択してください</option>
+          {sampleCampaigns.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </Select>
+      </FormControl>
     </VStack>
   );
 };
@@ -162,26 +197,41 @@ const SearchConditionModal = ({
   isOpen,
   onClose,
 }) => {
+  const [formValues, setFormValues] = useState(searchCondition);
+
+  useEffect(() => {
+    setFormValues(searchCondition);
+  }, [searchCondition, isOpen]);
+
+  const handleChange = (values) => {
+    setFormValues((prev) => ({ ...prev, ...values }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({ values: formValues });
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <Form
-          onSubmit={onSubmit}
-          initialValues={{
-            ...searchCondition,
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <ModalHeader>集計結果の検索条件</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <SearchConditionFormContent />
+            <SearchConditionFormContent
+              formValues={formValues}
+              onChange={handleChange}
+            />
           </ModalBody>
 
           <ModalFooter>
-            <Button type="submit" title="検索" color="indigo" />
+            <Button type="submit" colorScheme="blue">
+              検索
+            </Button>
           </ModalFooter>
-        </Form>
+        </form>
       </ModalContent>
     </Modal>
   );
@@ -199,75 +249,79 @@ const App = () => {
 
   const handleChangeSearchCondition = useCallback(
     ({ values }) => {
-      setSearchCondition((searchCondition) => {
-        return {
-          ...searchCondition,
-          ...values,
-        };
-      });
+      setSearchCondition((prev) => ({
+        ...prev,
+        ...values,
+      }));
       onClose();
     },
-    [setSearchCondition, onClose]
+    [onClose]
+  );
+
+  const handleDateRangeChange = useCallback(
+    (values) => {
+      setSearchCondition((prev) => ({
+        ...prev,
+        ...values,
+      }));
+    },
+    []
   );
 
   return (
-    <div className="flex flex-col gap-2 w-full h-full">
+    <Flex direction="column" gap={2} w="100%" h="100%">
       <SearchConditionModal
         isOpen={isOpen}
         onClose={onClose}
         searchCondition={searchCondition}
         onSubmit={handleChangeSearchCondition}
       />
-      <VStack align="start" spacing="1rem" className="w-full max-w-6xl">
+      <VStack align="start" spacing="1rem" width="100%" maxWidth="6xl">
         {/* SearchCondition Form */}
-        <div className="flex flex-row justify-between w-full items-center">
-          <Heading size="md" className="mr-4">
+        <Flex justifyContent="space-between" width="100%" alignItems="center">
+          <Heading size="md" mr={4}>
             株式会社ベースマキナ
           </Heading>
-          <div className="flex flex-row space-x-4 items-center">
-            <Form
-              onSubmit={handleChangeSearchCondition}
-              initialValues={{
-                ...searchCondition,
-              }}
-            >
-              <DateRangeFormContent searchCondition={searchCondition} />
-            </Form>
-            <button
-              class="flowbite-btn flowbite-btn-white"
-              type="button"
-              style={{
-                marginBottom: "0px",
-                width: "190px",
-              }}
+          <Flex alignItems="center" gap={4}>
+            <DateRangeFormContent
+              searchCondition={searchCondition}
+              onChange={handleDateRangeChange}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              width="190px"
               onClick={onOpen}
             >
               検索条件を変更する
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Flex>
+        </Flex>
 
         {/* Stats */}
-        <Grid repeatCount={4} gap={4} width="full">
-          <Stat
-            title="消化済み広告予算"
-            value={`${stats.promotion_budget_usage.toLocaleString()}円`}
-          />
-          <Stat title="動画配信数" value={stats.stream_count} />
-          <Stat
-            title="閲覧UU数"
-            value={stats.audience_count.toLocaleString()}
-          />
-          <Stat
-            title="コメント数"
-            value={stats.comment_count.toLocaleString()}
-          />
-        </Grid>
+        <SimpleGrid columns={4} spacing={4} width="100%">
+          <Stat>
+            <StatLabel>消化済み広告予算</StatLabel>
+            <StatNumber>{`${stats.promotion_budget_usage.toLocaleString()}円`}</StatNumber>
+          </Stat>
+          <Stat>
+            <StatLabel>動画配信数</StatLabel>
+            <StatNumber>{stats.stream_count}</StatNumber>
+          </Stat>
+          <Stat>
+            <StatLabel>閲覧UU数</StatLabel>
+            <StatNumber>{stats.audience_count.toLocaleString()}</StatNumber>
+          </Stat>
+          <Stat>
+            <StatLabel>コメント数</StatLabel>
+            <StatNumber>{stats.comment_count.toLocaleString()}</StatNumber>
+          </Stat>
+        </SimpleGrid>
 
         {/* Charts */}
         <Heading size="sm">宣伝実績レポート</Heading>
-        <Grid repeatCount={2} gap={4} width="full">
-          <div className="w-full">
+        <SimpleGrid columns={2} spacing={4} width="100%">
+          <Box width="100%">
             <Bar
               options={{
                 responsive: true,
@@ -298,8 +352,8 @@ const App = () => {
                 ],
               }}
             />
-          </div>
-          <div className="w-full">
+          </Box>
+          <Box width="100%">
             <Bar
               options={{
                 responsive: true,
@@ -330,10 +384,10 @@ const App = () => {
                 ],
               }}
             />
-          </div>
-        </Grid>
+          </Box>
+        </SimpleGrid>
       </VStack>
-    </div>
+    </Flex>
   );
 };
 

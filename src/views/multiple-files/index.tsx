@@ -1,18 +1,24 @@
-import { Alert, Flexbox, Heading, Box } from "@basemachina/view";
+import {
+  Alert,
+  AlertIcon,
+  Flex,
+  Heading,
+  Box
+} from "@chakra-ui/react";
 import { UsersTable } from "./UsersTable";
 
 const App = () => {
   return (
-    <Flexbox direction="col">
-      <Heading text="サンプル画面" size="lg" />
-      <Alert
-        message="これはサンプルのコードを元にした画面です。ドキュメントを参考にして業務に沿った画面に変更してください。"
-        color="yellow"
-      />
-      <Box width="full">
+    <Flex direction="column" gap={4}>
+      <Heading size="lg">サンプル画面</Heading>
+      <Alert status="warning">
+        <AlertIcon />
+        これはサンプルのコードを元にした画面です。ドキュメントを参考にして業務に沿った画面に変更してください。
+      </Alert>
+      <Box width="100%">
         <UsersTable />
       </Box>
-    </Flexbox>
+    </Flex>
   );
 };
 

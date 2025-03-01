@@ -1,5 +1,14 @@
 import { useMemo } from "react";
-import { Badge, Table } from "@basemachina/view";
+import {
+  Badge,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer
+} from "@chakra-ui/react";
 
 const users = [
   {
@@ -48,10 +57,34 @@ export const UsersTable = () => {
     return users.map((user) => {
       return {
         ...user,
-        status: <Badge title={user.status} color={statusColor[user.status]} />,
+        status: <Badge colorScheme={statusColor[user.status]}>{user.status}</Badge>,
       };
     });
   }, [users]);
 
-  return <Table rows={rows} columnNames={columnNames} />;
+  return (
+    <TableContainer>
+      <Table size="sm">
+        <Thead>
+          <Tr>
+            {Object.entries(columnNames).map(([key, label]) => (
+              <Th key={key}>{label}</Th>
+            ))}
+          </Tr>
+        </Thead>
+        <Tbody>
+          {rows.map((row, index) => (
+            <Tr key={index}>
+              <Td>{row.id}</Td>
+              <Td>{row.name}</Td>
+              <Td>{row.address}</Td>
+              <Td>{row.email}</Td>
+              <Td>{row.status}</Td>
+              <Td>{row.created_at}</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
+  );
 };

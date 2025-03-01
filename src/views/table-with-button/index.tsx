@@ -1,15 +1,26 @@
 import {
-  Table,
-  Pagination,
   openViewLink,
-  LoadingIndicator,
   // useExecuteActionLazy, // Commented out for mock implementation
 } from "@basemachina/view";
 import {
   HStack,
   Heading,
-  Button as ChakraButton,
+  Button,
   Badge,
+  Flex,
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Center,
+  Spinner,
+  ButtonGroup,
+  IconButton,
+  Text
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -106,78 +117,116 @@ const App = () => {
   }, [page]);
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <Box p={4}>Error: {error.message}</Box>;
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full h-full">
+    <Flex direction="column" gap={2} w="100%" h="100%">
       <Heading size="sm">プロモーション配信履歴</Heading>
-      <div className="flex w-full">
+      <Box w="100%">
         {!data || loading ? (
-          <LoadingIndicator />
+          <Center p={8}>
+            <Spinner />
+          </Center>
         ) : (
-          <Table
-            rows={
-              data.results[0].success.map((streamHistory: StreamHistory) => {
-                return {
-                  account: (
-                    <ChakraButton
-                      colorScheme="gray"
-                      variant="outline"
-                      size="xs"
-                      px="2"
-                      minWidth="120px"
-                      onClick={() => { }}
-                    >
-                      {streamHistory.account_id}
-                    </ChakraButton>
-                  ),
-                  revenue: `${streamHistory.revenue}円`,
-                  payment_status: (
-                    <PaymentStatusBadge status={streamHistory.payment_status} />
-                  ),
-                  streamed_at: streamHistory.streamed_at,
-                  total_views: streamHistory.total_views,
-                  billable_views: streamHistory.billable_views,
-                  favorites: streamHistory.favorites,
-                  comments: streamHistory.comments,
-                  item_id: (
-                    <ChakraButton
-                      colorScheme="gray"
-                      variant="outline"
-                      size="xs"
-                      width="120px"
-                      onClick={handleItemButtonClick}
-                    >
-                      詳細
-                    </ChakraButton>
-                  ),
-                };
-              }) ?? []
-            }
-            columnNames={{
-              account: "アカウント",
-              revenue: "報酬金額",
-              payment_status: "報酬支払状況",
-              streamed_at: "配信日時",
-              total_views: "実績再生数",
-              billable_views: "支払対象再生数",
-              favorites: "いいね数",
-              comments: "コメント数",
-              item_id: "プロモーション対象",
-            }}
-            searchDisabled={true}
-            scrollable={true}
-          />
+          <TableContainer>
+            <Table size="sm">
+              <Thead>
+                <Tr>
+                  <Th>アカウント</Th>
+                  <Th>報酬金額</Th>
+                  <Th>報酬支払状況</Th>
+                  <Th>配信日時</Th>
+                  <Th>実績再生数</Th>
+                  <Th>支払対象再生数</Th>
+                  <Th>いいね数</Th>
+                  <Th>コメント数</Th>
+                  <Th>プロモーション対象</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {data.results[0].success.map((streamHistory: StreamHistory, index: number) => (
+                  <Tr key={index}>
+                    <Td>
+                      <Button
+                        colorScheme="gray"
+                        variant="outline"
+                        size="xs"
+                        px="2"
+                        minWidth="120px"
+                        onClick={() => { }}
+                      >
+                        {streamHistory.account_id}
+                      </Button>
+                    </Td>
+                    <Td>{`${streamHistory.revenue}円`}</Td>
+                    <Td>
+                      <PaymentStatusBadge status={streamHistory.payment_status} />
+                    </Td>
+                    <Td>{streamHistory.streamed_at}</Td>
+                    <Td>{streamHistory.total_views}</Td>
+                    <Td>{streamHistory.billable_views}</Td>
+                    <Td>{streamHistory.favorites}</Td>
+                    <Td>{streamHistory.comments}</Td>
+                    <Td>
+                      <Button
+                        colorScheme="gray"
+                        variant="outline"
+                        size="xs"
+                        width="120px"
+                        onClick={handleItemButtonClick}
+                      >
+                        詳細
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
         )}
-      </div>
-      <div className="flex-none flex space-x-2 pb-2">
-        <Pagination currentPage={page} onChange={handleChangePage} />
+      </Box>
+      <Flex justifyContent="flex-start" alignItems="center" pb={2} gap={2}>
+        <ButtonGroup size="sm" isAttached variant="outline">
+          <IconButton
+            aria-label="Previous page"
+            icon={<Text>←</Text>}
+            onClick={() => handleChangePage(Math.max(1, page - 1))}
+            isDisabled={page <= 1}
+          />
+          <Button onClick={() => handleChangePage(1)} isActive={page === 1}>
+            1
+          </Button>
+          {page > 3 && <Button isDisabled>...</Button>}
+          {page > 2 && (
+            <Button onClick={() => handleChangePage(page - 1)}>
+              {page - 1}
+            </Button>
+          )}
+          {page > 1 && page < 10 && (
+            <Button isActive={true}>{page}</Button>
+          )}
+          {page < 9 && (
+            <Button onClick={() => handleChangePage(page + 1)}>
+              {page + 1}
+            </Button>
+          )}
+          {page < 8 && <Button isDisabled>...</Button>}
+          <Button onClick={() => handleChangePage(10)} isActive={page === 10}>
+            10
+          </Button>
+          <IconButton
+            aria-label="Next page"
+            icon={<Text>→</Text>}
+            onClick={() => handleChangePage(Math.min(10, page + 1))}
+            isDisabled={page >= 10}
+          />
+        </ButtonGroup>
         <HStack>
           <Badge>現在のページ: {page}ページ目</Badge>
         </HStack>
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   );
 };
 
