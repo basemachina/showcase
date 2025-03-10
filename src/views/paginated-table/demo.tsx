@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useExecuteActionLazy } from "@basemachina/view";
+import React, { useState, useEffect, useCallback } from "react";
 import { Box, Heading, Flex, Card } from "@chakra-ui/react";
 import PaginatedTable from "./table";
 import { formatDate } from "../utils/format";
@@ -86,6 +87,44 @@ const PaginatedTableDemo = () => {
         }, 300);
     };
 
+    // useExecuteActionLazyを使用したバージョン
+    // -----------------------------------------------
+    // const [getUsersAction, { data, loading: actionLoading, error }] = 
+    //     useExecuteActionLazy("get-users");
+
+    // // ユーザーデータの状態
+    // const [users, setUsers] = useState<User[]>([]);
+    // const [totalCount, setTotalCount] = useState(0);
+
+    // // ページ変更時のアクション実行
+    // const handlePageChangeWithAction = useCallback((page: number) => {
+    //     setCurrentPage(page);
+    //     
+    //     // アクションを実行してユーザーデータを取得
+    //     getUsersAction({
+    //         page,
+    //         pageSize,
+    //         // 必要に応じて検索条件などのパラメータを追加
+    //     });
+    // }, [getUsersAction, pageSize]);
+
+    // // データが変更されたときの処理
+    // useEffect(() => {
+    //     if (data && data.results && data.results[0]?.success) {
+    //         const result = data.results[0].success;
+    //         setUsers(result.users);
+    //         setTotalCount(result.totalCount);
+    //     }
+    // }, [data]);
+
+    // // 初回レンダリング時にデータを取得
+    // useEffect(() => {
+    //     handlePageChangeWithAction(1);
+    // }, [handlePageChangeWithAction]);
+
+    // // アクションを使用する場合のページネーションの総ページ数
+    // const totalPagesFromAction = Math.ceil(totalCount / pageSize);
+
     return (
         <Flex direction="column" gap={4} w="100%" h="100%">
             <Heading size="md">ユーザー一覧</Heading>
@@ -104,6 +143,23 @@ const PaginatedTableDemo = () => {
                     loading={loading}
                     emptyMessage="ユーザーが見つかりません"
                 />
+
+                {/* useExecuteActionLazyを使用したバージョン */}
+                {/* 
+                <PaginatedTable
+                    data={users}
+                    columns={columns}
+                    pagination={{
+                        currentPage,
+                        totalPages: totalPagesFromAction,
+                        pageSize,
+                        totalItems: totalCount
+                    }}
+                    onPageChange={handlePageChangeWithAction}
+                    loading={actionLoading}
+                    emptyMessage="ユーザーが見つかりません"
+                />
+                */}
             </Card>
         </Flex>
     );
