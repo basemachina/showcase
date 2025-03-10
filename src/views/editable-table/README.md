@@ -2,6 +2,8 @@
 
 このコンポーネントは、テーブル内のセルを直接編集できる機能を提供します。商品マスタの詳細項目を編集するサンプル実装です。
 
+![スクリーンショット](https://github.com/basemachina/showcase/blob/main/src/views/editable-table/editable-table-screenshot.gif)
+
 ## 機能
 
 - テーブル内のセルを直接編集できる
