@@ -37,6 +37,17 @@ export default {
         use: "babel-loader",
         exclude: /node_modules/,
       },
+      // Inline font when explicitly requested with ?inline to avoid network fetch
+      {
+        test: /\.(?:ttf|otf)$/i,
+        resourceQuery: /inline/,
+        type: "asset/inline",
+      },
+      {
+        test: /\.(?:ttf|otf|woff2?|eot)$/i,
+        resourceQuery: { not: [/inline/] },
+        type: "asset/resource",
+      },
     ],
   },
   optimization: {
