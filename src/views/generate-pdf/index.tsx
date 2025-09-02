@@ -21,9 +21,7 @@ import {
 import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { BlobProvider, Document, Font, Page, PDFViewer, StyleSheet, Text, View } from "@react-pdf/renderer";
-// @ts-ignore
 import NotoSansRegular from "./fonts/NotoSansJP-Regular.ttf?inline";
-// @ts-ignore
 import NotoSansBold from "./fonts/NotoSansJP-Bold.ttf?inline";
 
 // 日本語文字化け対策: ローカル配置の Noto Sans JP (TTF) を登録
