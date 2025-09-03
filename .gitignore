@@ -1,6 +1,5 @@
 node_modules
 tsconfig.tsbuildinfo
 dist
-bm-view-preview.config.js
 .cursorrules
 .clinerules
